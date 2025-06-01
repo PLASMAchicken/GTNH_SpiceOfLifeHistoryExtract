@@ -1,6 +1,8 @@
 # nbtextractorweb
 
-This template should help get you started developing with Vue 3 in Vite.
+Dump ItemIDs via NEI and place into public/item.csv.
+
+
 
 ## Recommended IDE Setup
 
