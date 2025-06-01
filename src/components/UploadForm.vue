@@ -92,11 +92,7 @@ async function process() {
       IdToName[x.ID] = { name: x['Display Name'], modshort: ModToShort(x['Mod']) }
     })
 
-    output.value = JSON.stringify(
-      ids.map((x) => IdToName[x] || { name: x, modshort: '' }),
-      null,
-      2,
-    )
+    output.value = JSON.stringify(ids.map((x) => IdToName[x] || { name: x, modshort: '' }))
   } catch (err) {
     output.value = err.toString()
   }
