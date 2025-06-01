@@ -8,10 +8,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "gh-pages-deploy": "node scripts/gh-pages-deploy.js"
   },
   "dependencies": {
     "buffer": "^6.0.3",
+    "execa": "^9.6.0",
     "pako": "^2.1.0",
     "papaparse": "^5.5.3",
     "prismarine-nbt": "^2.7.0",
