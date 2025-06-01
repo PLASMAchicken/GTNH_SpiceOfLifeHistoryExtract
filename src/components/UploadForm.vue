@@ -78,8 +78,9 @@ async function process() {
       parsed.value.ForgeData.value.PlayerPersisted.value.SpiceOfLifeHistory.value.FullHistory.value.Foods.value.value.map(
         (x) => x.id.value,
       )
+      const baseUrl = import.meta.env.BASE_URL || '/';
 
-      const response = await fetch('/item.csv')
+      const response = await fetch(baseUrl+'/item.csv')
     if (!response.ok) {
       throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
     }
