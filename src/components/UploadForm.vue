@@ -22,7 +22,6 @@ import { Buffer } from 'buffer'
 const nbtFile = ref(null)
 const output = ref('')
 
-// Since you use browserify bundle exposing require globally:
 const nbt = require('prismarine-nbt')
 
 function onNBTChange(e) {
@@ -80,7 +79,11 @@ async function process() {
         (x) => x.id.value,
       )
 
-    const csvText = await fetch('/item.csv').then((res) => res.text())
+      const response = await fetch('/item.csv')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
+    }
+    const csvText = await response.text();
     const results = Papa.parse(csvText, { header: true }).data
 
     const IdToName = []
