@@ -43,6 +43,12 @@ function ModToShort(mod) {
       return "(TiC)"
     case 'ExtraTrees':
       return "(ET)"
+    case 'TwilightForest':
+      return "(TF)"
+    case 'witchery':
+      return "(Witchery)"
+    case 'ThaumicHorizons':
+      return "(TC)"
     default:
       return mod
   }
