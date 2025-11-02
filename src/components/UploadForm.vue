@@ -76,7 +76,7 @@ function ModToShort(mod) {
     case 'ThaumicHorizons':
       return "(TC)"
     case 'etfuturum':
-      return "(EF)"
+      return "(EFR)"
     default:
       return mod
   }
