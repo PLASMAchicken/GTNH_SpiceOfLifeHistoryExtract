@@ -77,6 +77,8 @@ function ModToShort(mod) {
       return "(TC)"
     case 'etfuturum':
       return "(EFR)"
+    case 'BiomesOPlenty':
+        return "(BoP)"
     default:
       return mod
   }
