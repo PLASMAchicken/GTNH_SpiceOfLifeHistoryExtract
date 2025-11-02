@@ -79,6 +79,8 @@ function ModToShort(mod) {
       return "(EFR)"
     case 'BiomesOPlenty':
         return "(BoP)"
+    case 'cookingforblockheads':
+      return "(Cooking for BH)"
     default:
       return mod
   }
