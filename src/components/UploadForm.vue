@@ -9,10 +9,15 @@
     <br> - Items with same ID but diffrent Damage
     <br>
     <br>
+    Matches id via level.dat to name, matches name to Display Name via NEI dump
+    <br>
     <br>
     <h2>Convert PlayerData NBT into SpiceOfLife History JSON</h2>
+    <h4>level.dat:</h4>
+    <input type="file" @change="onLevelChange" />
+    <h4>playerdata.dat</h4>
     <input type="file" @change="onNBTChange" />
-    <button @click="process" :disabled="!nbtFile">Process</button>
+    <button @click="process" :disabled="!nbtFile || !levelFile">Process</button>
     <textarea
       v-model="output"
       rows="20"
@@ -30,9 +35,14 @@ import Papa from 'papaparse'
 import { Buffer } from 'buffer'
 
 const nbtFile = ref(null)
+const levelFile = ref(null)
 const output = ref('')
 
 const nbt = require('prismarine-nbt')
+
+function onLevelChange(e) {
+  levelFile.value = e.target.files[0]
+}
 
 function onNBTChange(e) {
   nbtFile.value = e.target.files[0]
@@ -97,11 +107,34 @@ async function process() {
 
     const parsed = await parseNBT(Buffer.from(buffer))
 
+    const nbtData_level = await readFileAsArrayBuffer(levelFile.value)
+    const buffer_level = isGzipped(new Uint8Array(nbtData_level))
+      ? pako.ungzip(new Uint8Array(nbtData_level))
+      : new Uint8Array(nbtData_level)
+    const parsed_level = await parseNBT(Buffer.from(buffer_level))
+    console.log(parsed_level);
+  const name_id_matcher = parsed_level.value.FML.value.ItemData.value.value.map(x =>  ({id: x.V.value, tag: x.K.value.slice(1)}));
+
+    const IdToTag = [];
+
+     name_id_matcher.forEach((x) => {
+      IdToTag[x.id] = x.tag;
+    })
+    console.log(IdToTag);
+
     // Access the NBT structure - adjust if your structure differs
-    const ids =
-      parsed.value.ForgeData.value.PlayerPersisted.value.SpiceOfLifeHistory.value.FullHistory.value.Foods.value.value.map(
-        (x) => x.id.value,
-      )
+const eaten_ids =
+  parsed.value.ForgeData.value.PlayerPersisted.value.SpiceOfLifeHistory.value.FullHistory.value.Foods.value.value.map(
+    (x) => ({
+      id: x.id?.value,
+      damage: x.Damage?.value ?? 0,
+    })
+  );
+
+
+const eaten_tags = eaten_ids.map(x => ({tag: IdToTag[x.id], ...x}));
+console.log(eaten_tags)
+
       const baseUrl = import.meta.env.BASE_URL || '/';
 
       const response = await fetch(baseUrl+'/item.csv')
@@ -111,12 +144,12 @@ async function process() {
     const csvText = await response.text();
     const results = Papa.parse(csvText, { header: true }).data
 
-    const IdToName = []
+    const TagToName = []
     results.forEach((x) => {
-      IdToName[x.ID] = { name: x['Display Name'], modshort: ModToShort(x['Mod']) }
+      TagToName[x.Name] = { name: x['Display Name'], modshort: ModToShort(x['Mod']) }
     })
+    output.value = JSON.stringify(eaten_tags.map((x) => TagToName[x.tag] || { name: x, modshort: '' }))
 
-    output.value = JSON.stringify(ids.map((x) => IdToName[x] || { name: x, modshort: '' }))
   } catch (err) {
     output.value = err.toString()
   }
