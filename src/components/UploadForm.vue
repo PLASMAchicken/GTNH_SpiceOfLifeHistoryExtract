@@ -1,6 +1,15 @@
 <template>
   <div>
     <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a></h4>
+    <br>
+    <br>
+    <br>
+    <h3>ToDo:</h3>
+    - GT5u Items
+    <br> - Items with same ID but diffrent Damage
+    <br>
+    <br>
+    <br>
     <h2>Convert PlayerData NBT into SpiceOfLife History JSON</h2>
     <input type="file" @change="onNBTChange" />
     <button @click="process" :disabled="!nbtFile">Process</button>
