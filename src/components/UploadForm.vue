@@ -2,10 +2,7 @@
   <div>
     <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a></h4>
     <br>
-    <br>
     <h4>Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a></h4>
-    <br>
-    <br>
     <br>
     <h3>ToDo:</h3>
     - WIP: GT5u Items (EXPERIMENTAL)
@@ -15,7 +12,7 @@
     <input type="checkbox" id="checkbox" v-model="transform_GT_meta" />
 
 
-    <label for="checkbox">Transform GT5u Items (might be wrong): {{ transform_GT_meta }}</label>
+    <label for="checkbox">Transform GT5u Items (should work for 2.8.1): {{ transform_GT_meta }}</label>
     <br>
     <br>
     Matches id via level.dat to name, matches name to Display Name via NEI dump
@@ -46,7 +43,7 @@ import { Buffer } from 'buffer'
 const nbtFile = ref(null)
 const levelFile = ref(null)
 const output = ref('')
-const transform_GT_meta = ref(false);
+const transform_GT_meta = ref(true);
 
 const nbt = require('prismarine-nbt')
 
