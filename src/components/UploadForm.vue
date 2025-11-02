@@ -183,7 +183,7 @@ console.log(eaten_tags)
         temp.name = metaItemConvert[x.damage]
         temp.gt_meta = true;
       }
-        temp.damage = x.damage;
+      temp.damage = x.damage;
 
       if(x.tag == "minecraft:golden_apple") {
         if(temp.damage == 0) {
@@ -199,6 +199,7 @@ console.log(eaten_tags)
         temp.modshort += " - DAMAGE:" + temp.damage;
       }
 
+      delete temp.damage;
       return temp || { name: x, modshort: '', notfound: true };
 
     }))
