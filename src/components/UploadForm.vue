@@ -5,8 +5,14 @@
     <br>
     <br>
     <h3>ToDo:</h3>
-    - GT5u Items
+    - WIP: GT5u Items (EXPERIMENTAL)
     <br> - Items with same ID but diffrent Damage
+    <br>
+    <br>
+    <input type="checkbox" id="checkbox" v-model="transform_GT_meta" />
+
+
+    <label for="checkbox">Transform GT5u Items (might be wrong): {{ transform_GT_meta }}</label>
     <br>
     <br>
     Matches id via level.dat to name, matches name to Display Name via NEI dump
@@ -37,6 +43,7 @@ import { Buffer } from 'buffer'
 const nbtFile = ref(null)
 const levelFile = ref(null)
 const output = ref('')
+const transform_GT_meta = ref(false);
 
 const nbt = require('prismarine-nbt')
 
@@ -68,6 +75,8 @@ function ModToShort(mod) {
       return "(Witchery)"
     case 'ThaumicHorizons':
       return "(TC)"
+    case 'etfuturum':
+      return "(EF)"
     default:
       return mod
   }
@@ -139,16 +148,43 @@ console.log(eaten_tags)
 
       const response = await fetch(baseUrl+'/item.csv')
     if (!response.ok) {
-      throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
+      throw new Error(`Failed to fetch item.csv: ${response.status} ${response.statusText}`)
     }
     const csvText = await response.text();
     const results = Papa.parse(csvText, { header: true }).data
+
+
+    const response_GT = await fetch(baseUrl+'/metaitem02.csv')
+    if (!response_GT.ok) {
+      throw new Error(`Failed to fetch metaitem.CSV: ${response.status} ${response.statusText}`)
+    }
+    const csvText_GT = await response_GT.text();
+    const results_GT = Papa.parse(csvText_GT, { header: true }).data
+    const metaItemConvert = [];
+    results_GT.forEach(x => {
+      metaItemConvert[x.metaID] = x.stackName;
+    })
+
+    console.log(metaItemConvert);
+
 
     const TagToName = []
     results.forEach((x) => {
       TagToName[x.Name] = { name: x['Display Name'], modshort: ModToShort(x['Mod']) }
     })
-    output.value = JSON.stringify(eaten_tags.map((x) => TagToName[x.tag] || { name: x, modshort: '' }))
+
+
+    output.value = JSON.stringify(eaten_tags.map((x) => {
+
+      if(x.tag == "gregtech:gt.metaitem.02" && transform_GT_meta.value) {
+        let temp = { ...TagToName[x.tag] };
+        temp.name = metaItemConvert[x.damage]
+        return temp;
+      }
+
+      return TagToName[x.tag] || { name: x, modshort: '' };
+
+    }))
 
   } catch (err) {
     output.value = err.toString()
