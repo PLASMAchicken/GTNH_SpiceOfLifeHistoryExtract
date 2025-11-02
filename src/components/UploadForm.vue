@@ -175,14 +175,29 @@ console.log(eaten_tags)
 
 
     output.value = JSON.stringify(eaten_tags.map((x) => {
+        let temp = { ...TagToName[x.tag] };
 
       if(x.tag == "gregtech:gt.metaitem.02" && transform_GT_meta.value) {
-        let temp = { ...TagToName[x.tag] };
         temp.name = metaItemConvert[x.damage]
-        return temp;
+        temp.gt_meta = true;
+      }
+        temp.damage = x.damage;
+
+      if(x.tag == "minecraft:golden_apple") {
+        if(temp.damage == 0) {
+          temp.name = "Golden Apple (Ingots)";
+        }
+        else if(temp.damage == 1) {
+          temp.name = "Golden Apple (Blocks)";
+          temp.damage = 0;
+        }
       }
 
-      return TagToName[x.tag] || { name: x, modshort: '' };
+      if(temp.damage != 0 && !temp.gt_meta) {
+        temp.modshort += " - DAMAGE:" + temp.damage;
+      }
+
+      return temp || { name: x, modshort: '', notfound: true };
 
     }))
 
