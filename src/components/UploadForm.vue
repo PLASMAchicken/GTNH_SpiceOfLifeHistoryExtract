@@ -33,7 +33,15 @@ function ModToShort(mod) {
     case 'gregtech':
       return '(GT)'
     case 'harvestcraft':
-      return "(Pam's)"
+      return "(Pam)"
+    case 'Natura':
+      return "(Natura)"
+    case 'Forestry':
+      return "(Forestry)"
+    case 'TConstruct':
+      return "(TiC)"
+    case 'ExtraTrees':
+      return "(ET)"
     default:
       return mod
   }
