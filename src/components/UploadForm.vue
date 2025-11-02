@@ -3,6 +3,9 @@
     <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a></h4>
     <br>
     <br>
+    <h4>Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a></h4>
+    <br>
+    <br>
     <br>
     <h3>ToDo:</h3>
     - WIP: GT5u Items (EXPERIMENTAL)
