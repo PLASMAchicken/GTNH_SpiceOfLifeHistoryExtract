@@ -1,9 +1,13 @@
 <template>
   <div>
-    <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a></h4>
+    <h4>Discord Channel: <a
+        href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a>
+    </h4>
     <br>
     <h3>How to use:</h3>
-    <h4>1. Make a copy of the Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a></h4>
+    <h4>1. Make a copy of the Spreadsheet: <a
+        href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a>
+    </h4>
     <h4>2. Add the Spreadsheet Script: <a href="./AutoImport.gs">AutoImport.gs</a></h4>
     <h4>3. Convert playerdata and level.dat to JSON.</h4>
     <h4>4. Paste into A1 in All Sheet</h4>
@@ -16,7 +20,8 @@
     <br>ShadowTheAge - GTNH NEI Repository to fetch Item Names
     <br>
     <br>
-    Matches id via level.dat to name, matches name to Display Name via <a href="https://shadowtheage.github.io/gtnh/">ShadowTheAge NEI</a>
+    Matches id via level.dat to name, matches name to Display Name via <a
+      href="https://shadowtheage.github.io/gtnh/">ShadowTheAge NEI</a>
     <br>
     <br>
     <h2>Convert PlayerData NBT into SpiceOfLife History JSON</h2>
@@ -29,13 +34,7 @@
     <button @click="process" :disabled="!nbtFile || !levelFile">Process</button>
     <br>
     <br>
-    <textarea
-      v-model="output"
-      rows="5"
-      cols="120"
-      readonly
-      style="white-space: pre; font-family: monospace"
-    ></textarea>
+    <textarea v-model="output" rows="5" cols="120" readonly style="white-space: pre; font-family: monospace"></textarea>
   </div>
 </template>
 
@@ -85,7 +84,7 @@ function ModToShort(mod) {
     case 'etfuturum':
       return "(EFR)"
     case 'BiomesOPlenty':
-        return "(BoP)"
+      return "(BoP)"
     case 'cookingforblockheads':
       return "(Cooking for BH)"
     default:
@@ -133,64 +132,64 @@ async function process() {
       : new Uint8Array(nbtData_level)
     const parsed_level = await parseNBT(Buffer.from(buffer_level))
     console.log(parsed_level);
-  const name_id_matcher = parsed_level.value.FML.value.ItemData.value.value.map(x =>  ({id: x.V.value, tag: x.K.value.slice(1)}));
+    const name_id_matcher = parsed_level.value.FML.value.ItemData.value.value.map(x => ({ id: x.V.value, tag: x.K.value.slice(1) }));
 
     const IdToTag = [];
 
-     name_id_matcher.forEach((x) => {
+    name_id_matcher.forEach((x) => {
       IdToTag[x.id] = x.tag;
     })
     console.log(IdToTag);
 
     // Access the NBT structure - adjust if your structure differs
-const eaten_ids =
-  parsed.value.ForgeData.value.PlayerPersisted.value.SpiceOfLifeHistory.value.FullHistory.value.Foods.value.value.map(
-    (x) => ({
-      id: x.id?.value,
-      damage: x.Damage?.value ?? 0,
-    })
-  );
+    const eaten_ids =
+      parsed.value.ForgeData.value.PlayerPersisted.value.SpiceOfLifeHistory.value.FullHistory.value.Foods.value.value.map(
+        (x) => ({
+          id: x.id?.value,
+          damage: x.Damage?.value ?? 0,
+        })
+      );
 
 
-const eaten_tags = eaten_ids.map(x => ({tag: IdToTag[x.id], ...x}));
-console.log(eaten_tags)
+    const eaten_tags = eaten_ids.map(x => ({ tag: IdToTag[x.id], ...x }));
+    console.log(eaten_tags)
 
     const response_data = await fetch("https://shadowtheage.github.io/gtnh/data/data.bin").then(x => x.arrayBuffer());
 
     const repo = Repository.load(ungzip(response_data).buffer);
 
-const pamFix = {
-"harvestcraft:pamcarrotCake": "Carrot Cake",
-"harvestcraft:pamcheeseCake": "Cheese Cake",
-"harvestcraft:pamcherrycheeseCake": "Cherry Cheese Cake",
-"harvestcraft:pampineappleupsidedownCake": "Pineapple Upside Down Cake",
-"harvestcraft:pamchocolatesprinkleCake": "Chocolate Sprinkles Cake",
-"harvestcraft:pamredvelvetCake": "Red Velvet Cake",
-"harvestcraft:pamlamingtonCake": "Lamington",
-"harvestcraft:pampavlovaCake": "Pavlova",
-"harvestcraft:pamholidayCake": "Holiday Cake",
-"harvestcraft:pampumpkincheeseCake": "Pumpkin Cheese Cake"
-};
+    const pamFix = {
+      "harvestcraft:pamcarrotCake": "Carrot Cake",
+      "harvestcraft:pamcheeseCake": "Cheese Cake",
+      "harvestcraft:pamcherrycheeseCake": "Cherry Cheese Cake",
+      "harvestcraft:pampineappleupsidedownCake": "Pineapple Upside Down Cake",
+      "harvestcraft:pamchocolatesprinkleCake": "Chocolate Sprinkles Cake",
+      "harvestcraft:pamredvelvetCake": "Red Velvet Cake",
+      "harvestcraft:pamlamingtonCake": "Lamington",
+      "harvestcraft:pampavlovaCake": "Pavlova",
+      "harvestcraft:pamholidayCake": "Holiday Cake",
+      "harvestcraft:pampumpkincheeseCake": "Pumpkin Cheese Cake"
+    };
 
     output.value = JSON.stringify(eaten_tags.map((x) => {
-        let temp = { };
-      if(x.tag == "minecraft:golden_apple") {
-        if(x.damage == 0) {
+      let temp = {};
+      if (x.tag == "minecraft:golden_apple") {
+        if (x.damage == 0) {
           temp.name = "Golden Apple (Ingots)";
         }
-        else if(x.damage == 1) {
+        else if (x.damage == 1) {
           temp.name = "Golden Apple (Blocks)";
         }
-      } else if(pamFix[x.tag]) {
+      } else if (pamFix[x.tag]) {
         temp.name = pamFix[x.tag];
         temp.modshort = ModToShort("harvestcraft");
       } else {
         const itemRepoTag = "i:" + x.tag + ":" + x.damage;
         let item = repo.GetById(itemRepoTag);
 
-        if(item == null) {
+        if (item == null) {
           console.error(itemRepoTag);
-          return {name: itemRepoTag, modshort: '- ERROR IN DB LOOKUP', notfound: true };
+          return { name: itemRepoTag, modshort: '- ERROR IN DB LOOKUP', notfound: true };
         }
 
         temp.name = item.name;
