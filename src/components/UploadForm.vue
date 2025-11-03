@@ -197,14 +197,9 @@ console.log(eaten_tags)
     })
 
 
-    const response_data = await fetch("https://shadowtheage.github.io/gtnh/data/data.bin");
-    const compressed = new Uint8Array(await response_data.arrayBuffer());
-    const decompressed = ungzip(compressed);
-    const arrayBuffer = decompressed.buffer.slice(
-      decompressed.byteOffset,
-      decompressed.byteOffset + decompressed.byteLength
-    );
-    const repo = Repository.load(arrayBuffer);
+    const response_data = await fetch("https://shadowtheage.github.io/gtnh/data/data.bin").then(x => x.arrayBuffer());
+
+    const repo = Repository.load(ungzip(response_data).buffer);
 
     output.value = JSON.stringify(eaten_tags.map((x) => {
         let temp = { ...TagToName[x.tag] };
