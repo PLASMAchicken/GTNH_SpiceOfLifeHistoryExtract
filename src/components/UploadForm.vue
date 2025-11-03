@@ -49,6 +49,15 @@ import { ref } from 'vue'
 import pako from 'pako'
 import Papa from 'papaparse'
 import { Buffer } from 'buffer'
+import { Repository } from 'https://shadowtheage.github.io/gtnh/repository.js'
+import { ungzip } from 'pako';
+
+
+// Read gzipped binary file
+//import dataUrl from '@/assets/data.bin';
+
+
+
 
 const nbtFile = ref(null)
 const levelFile = ref(null)
@@ -188,6 +197,15 @@ console.log(eaten_tags)
     })
 
 
+    const response_data = await fetch("https://shadowtheage.github.io/gtnh/data/data.bin");
+    const compressed = new Uint8Array(await response_data.arrayBuffer());
+    const decompressed = ungzip(compressed);
+    const arrayBuffer = decompressed.buffer.slice(
+      decompressed.byteOffset,
+      decompressed.byteOffset + decompressed.byteLength
+    );
+    const repo = Repository.load(arrayBuffer);
+
     output.value = JSON.stringify(eaten_tags.map((x) => {
         let temp = { ...TagToName[x.tag] };
 
@@ -208,13 +226,21 @@ console.log(eaten_tags)
       }
 
       if(temp.damage != 0 && !temp.gt_meta) {
-        temp.modshort += " - DAMAGE:" + temp.damage;
+        const item = repo.GetById("i:" + x.tag + ":" + x.damage); // ✅ call on instance!
+        console.log(item);
+        temp.name = item.name;
+        // temp.modshort += " - DAMAGE:" + temp.damage;
       }
 
       delete temp.damage;
       return temp || { name: x, modshort: '', notfound: true };
 
     }))
+
+
+
+
+
 
   } catch (err) {
     output.value = err.toString()
