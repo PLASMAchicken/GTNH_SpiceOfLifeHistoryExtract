@@ -202,6 +202,21 @@ async function process() {
         temp.modshort = ModToShort(item.mod);
       }
 
+      if(temp.modshort == "(GT)" && temp.name == "Dough") {
+        switch (x.damage) {
+          case 32561:
+              temp.name = "Dough in Bread Shape";
+            break;
+          case 32562:
+            temp.name = "Dough in Bun Shape";
+            break;
+          case 32563:
+            temp.name = "Dough in Baguette Shape";
+            break;
+          default:
+            break;
+        }
+      }
       // Decode HTML Item Names
       temp.name = decode(temp.name);
 
