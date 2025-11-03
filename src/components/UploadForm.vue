@@ -221,26 +221,33 @@ async function process() {
       }
 
       if (temp.modshort == "(Natura)" && x.tag == "Natura:natura.stewbowl") {
-        switch (x.damage) {
+        if(x.damage >= 14) {
+          temp.name = "Glowshroom ";
+        } else {
+          temp.name = "Mushroom ";
+        }
+
+        switch (x.damage % 14) {
           case 0:
-            temp.name = "Mushroom Stew 1";
+            temp.name += "Stew 1";
             break;
           case 3:
-            temp.name = "Mushroom Stew 2";
+            temp.name += "Stew 2";
             break;
           case 5:
-            temp.name = "Mushroom Stew 3";
+            temp.name += "Stew 3";
             break;
           case 12:
-            temp.name = "Mushroom Stew 4";
+            temp.name += "Stew 4";
             break;
           case 13:
-            temp.name = "Mushroom Stew 5";
+            temp.name += "Stew 5";
             break;
           default:
             break;
         }
       }
+
 
       // Decode HTML Item Names
       temp.name = decode(temp.name);
