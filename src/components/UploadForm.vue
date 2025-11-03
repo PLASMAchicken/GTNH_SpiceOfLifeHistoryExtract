@@ -2,7 +2,13 @@
   <div>
     <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841">https://discord.com/channels/181078474394566657/1329277071091957841</a></h4>
     <br>
-    <h4>Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a></h4>
+    <h3>How to use:</h3>
+    <h4>1. Make a copy of the Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a></h4>
+    <h4>2. Add the Spreadsheet Script: <a href="./AutoImport.gs">AutoImport.gs</a></h4>
+    <h4>3. Convert playerdata and level.dat to JSON.</h4>
+    <h4>4. Paste into A1 in All Sheet</h4>
+    <h4>5. Run Food Tools Import via the button in the Top Bar next to Help / Ask Gemini</h4>
+
     <br>
     <h3>ToDo:</h3>
     - WIP: GT5u Items (EXPERIMENTAL)
@@ -23,11 +29,15 @@
     <input type="file" @change="onLevelChange" />
     <h4>playerdata.dat</h4>
     <input type="file" @change="onNBTChange" />
+    <br>
+    <br>
     <button @click="process" :disabled="!nbtFile || !levelFile">Process</button>
+    <br>
+    <br>
     <textarea
       v-model="output"
-      rows="20"
-      cols="80"
+      rows="5"
+      cols="120"
       readonly
       style="white-space: pre; font-family: monospace"
     ></textarea>
