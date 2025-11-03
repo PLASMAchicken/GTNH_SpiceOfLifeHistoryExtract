@@ -36,7 +36,7 @@
     <br>
     <textarea v-model="output" rows="5" cols="120" readonly style="white-space: pre; font-family: monospace"></textarea>
     <br>
-    <p>Last update: {{ formattedDate }}</p>
+    <p>Last update: {{ formattedDate }}   // {{ gitCommit }}</p>
   </div>
 </template>
 
@@ -58,6 +58,7 @@ const nbt = require('prismarine-nbt')
 
 const lastUpdate = new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString();
 const formattedDate = new Date(lastUpdate).toLocaleString();
+const gitCommit = import.meta.env.LAST_COMMIT + " - " + import.meta.env.NOT_COMMITED + " unstaged changes";
 
 function onLevelChange(e) {
   levelFile.value = e.target.files[0]
