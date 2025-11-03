@@ -11,6 +11,10 @@ function getGitInfo() {
   let commit = 'unknown';
   let uncommitted = 0;
 
+    if (process.env.GITHUB_SHA) {
+    return {commit: process.env.GITHUB_SHA.slice(0, 7), uncommitted};
+  }
+
   try {
     commit = execSync('git rev-parse --short HEAD').toString().trim();
     const status = execSync('git status --porcelain').toString().trim();
