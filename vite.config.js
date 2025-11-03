@@ -6,6 +6,9 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
+    define: {
+    'import.meta.env.VITE_BUILD_DATE': JSON.stringify(new Date().toISOString())
+  },
   base: '/GTNH_SpiceOfLifeHistoryExtract/',
   plugins: [
     vue(),

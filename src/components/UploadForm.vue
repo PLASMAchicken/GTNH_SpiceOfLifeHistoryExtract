@@ -35,6 +35,8 @@
     <br>
     <br>
     <textarea v-model="output" rows="5" cols="120" readonly style="white-space: pre; font-family: monospace"></textarea>
+    <br>
+    <p>Last update: {{ formattedDate }}</p>
   </div>
 </template>
 
@@ -52,6 +54,10 @@ const output = ref('')
 
 // eslint-disable-next-line no-undef
 const nbt = require('prismarine-nbt')
+
+
+const lastUpdate = new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString();
+const formattedDate = new Date(lastUpdate).toLocaleString();
 
 function onLevelChange(e) {
   levelFile.value = e.target.files[0]
