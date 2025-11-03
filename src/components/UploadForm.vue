@@ -87,6 +87,8 @@ function ModToShort(mod) {
       return "(BoP)"
     case 'cookingforblockheads':
       return "(Cooking for BH)"
+    case 'minecraft':
+      return "(Vanilla)"
     default:
       return mod
   }
