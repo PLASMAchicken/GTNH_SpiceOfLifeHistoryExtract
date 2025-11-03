@@ -1,3 +1,14 @@
+/*
+ * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
+ * Version v0.3
+ * 
+ * Changelog:
+ *  - v0.1 - Inital
+ *  - v0.2 - Add sync Log
+ *  - v0.3 - Add Comment and Link to File
+ * 
+ */
+
 function checkFoodItemsFromA1() {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   const sheet = ss.getSheetByName('All')
