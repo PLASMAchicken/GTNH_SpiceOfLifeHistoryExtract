@@ -185,12 +185,12 @@ async function process() {
           temp.name = "Golden Apple (Blocks)";
         }
 
-      // Override for PamHarvestcraft Cakes
+        // Override for PamHarvestcraft Cakes
       } else if (pamFix[x.tag]) {
         temp.name = pamFix[x.tag];
         temp.modshort = ModToShort("harvestcraft");
 
-      // Default - get from Repository
+        // Default - get from Repository
       } else {
         const itemRepoTag = "i:" + x.tag + ":" + x.damage;
         let item = repo.GetById(itemRepoTag);
@@ -204,10 +204,10 @@ async function process() {
         temp.modshort = ModToShort(item.mod);
       }
 
-      if(temp.modshort == "(GT)" && temp.name == "Dough") {
+      if (temp.modshort == "(GT)" && temp.name == "Dough") {
         switch (x.damage) {
           case 32561:
-              temp.name = "Dough in Bread Shape";
+            temp.name = "Dough in Bread Shape";
             break;
           case 32562:
             temp.name = "Dough in Bun Shape";
