@@ -11,7 +11,9 @@ function getGitInfo() {
   let commit = 'unknown';
   let uncommitted = 0;
 
+    // eslint-disable-next-line no-undef
     if (process.env.GITHUB_SHA) {
+    // eslint-disable-next-line no-undef
     return {commit: process.env.GITHUB_SHA.slice(0, 7), uncommitted};
   }
 

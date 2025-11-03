@@ -58,7 +58,9 @@ const nbt = require('prismarine-nbt')
 
 const lastUpdate = new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString();
 const formattedDate = new Date(lastUpdate).toLocaleString();
-const gitCommit = import.meta.env.LAST_COMMIT + " - " + import.meta.env.NOT_COMMITED + " unstaged changes";
+
+const changes = " - " + import.meta.env.NOT_COMMITED + " unstaged changes"
+const gitCommit = import.meta.env.LAST_COMMIT + import.meta.env.NOT_COMMITED == 0 ? "" : changes;
 
 function onLevelChange(e) {
   levelFile.value = e.target.files[0]
