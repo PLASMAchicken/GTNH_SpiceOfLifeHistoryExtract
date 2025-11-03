@@ -16,13 +16,7 @@
     <br>ShadowTheAge - GTNH NEI Repository to fetch Item Names
     <br>
     <br>
-    <input type="checkbox" id="checkbox" v-model="transform_GT_meta" />
-
-
-    <label for="checkbox">Transform GT5u Items (should work for 2.8.1): {{ transform_GT_meta }}</label>
-    <br>
-    <br>
-    Matches id via level.dat to name, matches name to Display Name via NEI dump
+    Matches id via level.dat to name, matches name to Display Name via <a href="https://shadowtheage.github.io/gtnh/">ShadowTheAge NEI</a>
     <br>
     <br>
     <h2>Convert PlayerData NBT into SpiceOfLife History JSON</h2>
@@ -48,23 +42,17 @@
 <script setup>
 import { ref } from 'vue'
 import pako from 'pako'
-import Papa from 'papaparse'
 import { Buffer } from 'buffer'
 import { Repository } from 'https://shadowtheage.github.io/gtnh/repository.js'
 import { ungzip } from 'pako';
-
-
-// Read gzipped binary file
-//import dataUrl from '@/assets/data.bin';
-
-
+import { decode } from "html-entities";
 
 
 const nbtFile = ref(null)
 const levelFile = ref(null)
 const output = ref('')
-const transform_GT_meta = ref(true);
 
+// eslint-disable-next-line no-undef
 const nbt = require('prismarine-nbt')
 
 function onLevelChange(e) {
@@ -168,48 +156,10 @@ const eaten_ids =
 const eaten_tags = eaten_ids.map(x => ({tag: IdToTag[x.id], ...x}));
 console.log(eaten_tags)
 
-      const baseUrl = import.meta.env.BASE_URL || '/';
-
-      const response = await fetch(baseUrl+'/item.csv')
-    if (!response.ok) {
-      throw new Error(`Failed to fetch item.csv: ${response.status} ${response.statusText}`)
-    }
-    const csvText = await response.text();
-    const results = Papa.parse(csvText, { header: true }).data
-
-
-    const response_GT = await fetch(baseUrl+'/metaitem02.csv')
-    if (!response_GT.ok) {
-      throw new Error(`Failed to fetch metaitem.CSV: ${response.status} ${response.statusText}`)
-    }
-    const csvText_GT = await response_GT.text();
-    const results_GT = Papa.parse(csvText_GT, { header: true }).data
-    const metaItemConvert = [];
-    results_GT.forEach(x => {
-      metaItemConvert[x.metaID] = x.stackName;
-    })
-
-    console.log(metaItemConvert);
-
-
-    const TagToName = []
-    results.forEach((x) => {
-      TagToName[x.Name] = { name: x['Display Name'], modshort: ModToShort(x['Mod']) }
-    })
-
-
     const response_data = await fetch("https://shadowtheage.github.io/gtnh/data/data.bin").then(x => x.arrayBuffer());
 
     const repo = Repository.load(ungzip(response_data).buffer);
 
-    output.value = JSON.stringify(eaten_tags.map((x) => {
-        let temp = { ...TagToName[x.tag] };
-
-      if(x.tag == "gregtech:gt.metaitem.02" && transform_GT_meta.value) {
-        temp.name = metaItemConvert[x.damage]
-        temp.gt_meta = true;
-      }
-      temp.damage = x.damage;
 const pamFix = {
 "harvestcraft:pamcarrotCake": "Carrot Cake",
 "harvestcraft:pamcheeseCake": "Cheese Cake",
@@ -223,36 +173,36 @@ const pamFix = {
 "harvestcraft:pampumpkincheeseCake": "Pumpkin Cheese Cake"
 };
 
+    output.value = JSON.stringify(eaten_tags.map((x) => {
+        let temp = { };
       if(x.tag == "minecraft:golden_apple") {
-        if(temp.damage == 0) {
+        if(x.damage == 0) {
           temp.name = "Golden Apple (Ingots)";
         }
-        else if(temp.damage == 1) {
+        else if(x.damage == 1) {
           temp.name = "Golden Apple (Blocks)";
-          temp.damage = 0;
         }
-      }
       } else if(pamFix[x.tag]) {
         temp.name = pamFix[x.tag];
         temp.modshort = ModToShort("harvestcraft");
       } else {
+        const itemRepoTag = "i:" + x.tag + ":" + x.damage;
+        let item = repo.GetById(itemRepoTag);
 
-      if(temp.damage != 0 && !temp.gt_meta) {
-        const item = repo.GetById("i:" + x.tag + ":" + x.damage); // ✅ call on instance!
-        console.log(item);
+        if(item == null) {
+          console.error(itemRepoTag);
+          return {name: itemRepoTag, modshort: '- ERROR IN DB LOOKUP', notfound: true };
+        }
+
         temp.name = item.name;
-        // temp.modshort += " - DAMAGE:" + temp.damage;
+        temp.modshort = ModToShort(item.mod);
       }
 
-      delete temp.damage;
+      temp.name = decode(temp.name);
+
       return temp || { name: x, modshort: '', notfound: true };
 
     }))
-
-
-
-
-
 
   } catch (err) {
     output.value = err.toString()
