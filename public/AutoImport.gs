@@ -1,11 +1,12 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v0.3
+ * Version v0.4
  * 
  * Changelog:
  *  - v0.1 - Inital
- *  - v0.2 - Add sync Log
+ *  - v0.2 - Add sync Log and fix checkCols and nameCols
  *  - v0.3 - Add Comment and Link to File
+ *  - v0.4 - Add double tick check
  * 
  */
 
@@ -53,29 +54,47 @@ function checkFoodItemsFromA1() {
   const values = dataRange.getValues().flat()
 
   const found = []
+
   // Process each item
   itemsToCheck.forEach((item) => {
     let itemName = ''
-    const rowIndex = values.indexOf(item.name)
-    if (rowIndex !== -1) {
-      // Tick checkbox in column B of that row
-      itemName = item.name
-      sheet.getRange(rowIndex + 1, 2).setValue(true)
-    } else {
-      const withModShort = item.name + ' ' + item.modshort
-      itemName = withModShort
+    let rowIndex = -1
 
-      const rowIndex2 = values.indexOf(withModShort)
-      if (rowIndex2 !== -1) {
-        // Tick checkbox in column B of that row
-        sheet.getRange(rowIndex2 + 1, 2).setValue(true)
-      } else {
-        console.log(`Not found: ${item.name} /  ${withModShort}`)
-        notFound.push(`Not found: ${item.name} /  ${withModShort}`)
-        return
+    // First, check using modshort
+    const withModShort = item.name + ' ' + item.modshort
+    itemName = withModShort
+
+    rowIndex = values.indexOf(withModShort)
+
+    if (rowIndex !== -1) {
+      // Check if checkbox is already ticked in column B
+      const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
+      if (!isChecked) {
+        sheet.getRange(rowIndex + 1, 2).setValue(true)
+      } else if (found.includes(withModShort)) {
+        notFound.push(`ALREADY TICKed: ${item.name} / ${withModShort}`)
       }
       found.push(itemName)
+      return // move to next item
     }
+
+    // If not found, check by name only
+    rowIndex = values.indexOf(item.name)
+    if (rowIndex !== -1) {
+      const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
+      if (!isChecked) {
+        sheet.getRange(rowIndex + 1, 2).setValue(true)
+      } else if (found.includes(item.name)) {
+        notFound.push(`ALREADY TICKed: ${item.name} / ${withModShort}`)
+      }
+      itemName = item.name
+      found.push(itemName)
+      return // move to next item
+    }
+
+    // If neither found
+    console.log(`Not found: ${item.name} / ${withModShort}`)
+    notFound.push(`Not found: ${item.name} / ${withModShort}`)
   })
 
   let foundInOtherSheets = {}
@@ -136,5 +155,16 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('✔️ Food Tools')
     .addItem('Check Foods from Prompt', 'checkFoodItemsFromA1')
+    .addItem('Open History Extract', 'openHistoryExtract')
     .addToUi()
+}
+
+// Opens a dialog with a clickable link
+function openHistoryExtract() {
+  const html = HtmlService.createHtmlOutput(
+    '<a href="https://plasmachicken.github.io/GTNH_SpiceOfLifeHistoryExtract/" target="_blank">Open GTNH Spice of Life History Extract</a>',
+  )
+    .setWidth(300)
+    .setHeight(80)
+  SpreadsheetApp.getUi().showModalDialog(html, 'GTNH History Extract')
 }
