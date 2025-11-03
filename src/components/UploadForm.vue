@@ -173,6 +173,8 @@ async function process() {
 
     output.value = JSON.stringify(eaten_tags.map((x) => {
       let temp = {};
+
+      // Override for Golden Apples
       if (x.tag == "minecraft:golden_apple") {
         if (x.damage == 0) {
           temp.name = "Golden Apple (Ingots)";
@@ -180,9 +182,13 @@ async function process() {
         else if (x.damage == 1) {
           temp.name = "Golden Apple (Blocks)";
         }
+
+      // Override for PamHarvestcraft Cakes
       } else if (pamFix[x.tag]) {
         temp.name = pamFix[x.tag];
         temp.modshort = ModToShort("harvestcraft");
+
+      // Default - get from Repository
       } else {
         const itemRepoTag = "i:" + x.tag + ":" + x.damage;
         let item = repo.GetById(itemRepoTag);
@@ -196,9 +202,10 @@ async function process() {
         temp.modshort = ModToShort(item.mod);
       }
 
+      // Decode HTML Item Names
       temp.name = decode(temp.name);
 
-      return temp || { name: x, modshort: '', notfound: true };
+      return temp || { name: x, modshort: ' - ERROR', notfound: true };
 
     }))
 
