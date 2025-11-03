@@ -210,6 +210,18 @@ console.log(eaten_tags)
         temp.gt_meta = true;
       }
       temp.damage = x.damage;
+const pamFix = {
+"harvestcraft:pamcarrotCake": "Carrot Cake",
+"harvestcraft:pamcheeseCake": "Cheese Cake",
+"harvestcraft:pamcherrycheeseCake": "Cherry Cheese Cake",
+"harvestcraft:pampineappleupsidedownCake": "Pineapple Upside Down Cake",
+"harvestcraft:pamchocolatesprinkleCake": "Chocolate Sprinkles Cake",
+"harvestcraft:pamredvelvetCake": "Red Velvet Cake",
+"harvestcraft:pamlamingtonCake": "Lamington",
+"harvestcraft:pampavlovaCake": "Pavlova",
+"harvestcraft:pamholidayCake": "Holiday Cake",
+"harvestcraft:pampumpkincheeseCake": "Pumpkin Cheese Cake"
+};
 
       if(x.tag == "minecraft:golden_apple") {
         if(temp.damage == 0) {
@@ -220,6 +232,10 @@ console.log(eaten_tags)
           temp.damage = 0;
         }
       }
+      } else if(pamFix[x.tag]) {
+        temp.name = pamFix[x.tag];
+        temp.modshort = ModToShort("harvestcraft");
+      } else {
 
       if(temp.damage != 0 && !temp.gt_meta) {
         const item = repo.GetById("i:" + x.tag + ":" + x.damage); // ✅ call on instance!
