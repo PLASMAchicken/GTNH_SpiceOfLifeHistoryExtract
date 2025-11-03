@@ -10,9 +10,10 @@
     <h4>5. Run Food Tools Import via the button in the Top Bar next to Help / Ask Gemini</h4>
 
     <br>
-    <h3>ToDo:</h3>
-    - WIP: GT5u Items (EXPERIMENTAL)
-    <br> - Items with same ID but diffrent Damage
+    <h3>Thanks and Credits to:</h3>
+    Fox - Creating the Spreadsheet
+    <br>LioHD - Helping setup the Data Transformation
+    <br>ShadowTheAge - GTNH NEI Repository to fetch Item Names
     <br>
     <br>
     <input type="checkbox" id="checkbox" v-model="transform_GT_meta" />
