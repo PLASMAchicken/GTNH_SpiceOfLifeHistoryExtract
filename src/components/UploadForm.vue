@@ -41,7 +41,6 @@
 
 <script setup>
 import { ref } from 'vue'
-import pako from 'pako'
 import { Buffer } from 'buffer'
 import { Repository } from 'https://shadowtheage.github.io/gtnh/repository.js'
 import { ungzip } from 'pako';
@@ -123,14 +122,14 @@ async function process() {
   try {
     const nbtData = await readFileAsArrayBuffer(nbtFile.value)
     const buffer = isGzipped(new Uint8Array(nbtData))
-      ? pako.ungzip(new Uint8Array(nbtData))
+      ? ungzip(new Uint8Array(nbtData))
       : new Uint8Array(nbtData)
 
     const parsed = await parseNBT(Buffer.from(buffer))
 
     const nbtData_level = await readFileAsArrayBuffer(levelFile.value)
     const buffer_level = isGzipped(new Uint8Array(nbtData_level))
-      ? pako.ungzip(new Uint8Array(nbtData_level))
+      ? ungzip(new Uint8Array(nbtData_level))
       : new Uint8Array(nbtData_level)
     const parsed_level = await parseNBT(Buffer.from(buffer_level))
     console.log(parsed_level);
