@@ -1,12 +1,13 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v0.4
+ * Version v0.5
  * 
  * Changelog:
  *  - v0.1 - Inital
  *  - v0.2 - Add sync Log and fix checkCols and nameCols
  *  - v0.3 - Add Comment and Link to File
  *  - v0.4 - Add double tick check
+ *  - v0.5 - Hunger compare
  * 
  */
 
@@ -69,6 +70,12 @@ function checkFoodItemsFromA1() {
     if (rowIndex !== -1) {
       // Check if checkbox is already ticked in column B
       const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
+
+      const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
+      if(item.hunger != hungerValue) {
+        notFound.push(`WRONG HUNGER VALUE: ${item.name} / ${withModShort} / NBT: ${item.hunger} -> Sheet: ${hungerValue}`)
+      }
+
       if (!isChecked) {
         sheet.getRange(rowIndex + 1, 2).setValue(true)
       } else if (found.includes(withModShort)) {
@@ -82,6 +89,12 @@ function checkFoodItemsFromA1() {
     rowIndex = values.indexOf(item.name)
     if (rowIndex !== -1) {
       const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
+
+      const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
+      if(item.hunger != hungerValue) {
+        notFound.push(`WRONG HUNGER VALUE: ${item.name} / ${withModShort} / NBT: ${item.hunger} -> Sheet: ${hungerValue}`)
+      }
+
       if (!isChecked) {
         sheet.getRange(rowIndex + 1, 2).setValue(true)
       } else if (found.includes(item.name)) {

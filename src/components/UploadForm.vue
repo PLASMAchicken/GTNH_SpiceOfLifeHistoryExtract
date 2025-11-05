@@ -159,6 +159,7 @@ async function process() {
         (x) => ({
           id: x.id?.value,
           damage: x.Damage?.value ?? 0,
+          hunger: x.Hunger?.value ?? null
         })
       );
 
@@ -258,7 +259,7 @@ async function process() {
         }
       }
 
-
+      temp.hunger = x.hunger;
       // Decode HTML Item Names
       temp.name = decode(temp.name);
 
