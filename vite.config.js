@@ -37,7 +37,6 @@ export default defineConfig({
     'import.meta.env.VITE_BUILD_DATE': JSON.stringify(new Date().toISOString()),
     'import.meta.env.LAST_COMMIT': JSON.stringify(gitInfo.commit),
     'import.meta.env.NOT_COMMITED': JSON.stringify(gitInfo.uncommitted)
-
   },
   base: '/GTNH_SpiceOfLifeHistoryExtract/',
   plugins: [

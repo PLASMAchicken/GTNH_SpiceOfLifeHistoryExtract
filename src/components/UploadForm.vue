@@ -56,8 +56,7 @@ const output = ref('')
 const nbt = require('prismarine-nbt')
 
 
-const lastUpdate = new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString();
-const formattedDate = new Date(lastUpdate).toLocaleString();
+const formattedDate = new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString();
 
 const changesNum = import.meta.env.NOT_COMMITED;
 const changes = " - " + changesNum + " unstaged changes"
@@ -262,6 +261,16 @@ async function process() {
       temp.hunger = x.hunger;
       // Decode HTML Item Names
       temp.name = decode(temp.name);
+
+
+
+
+      temp.n = temp.name;
+      temp.m = temp.modshort;
+      temp.h = temp.hunger;
+      delete temp.name;
+      delete temp.modshort;
+      delete temp.hunger;
 
       return temp || { name: x, modshort: ' - ERROR', notfound: true };
 

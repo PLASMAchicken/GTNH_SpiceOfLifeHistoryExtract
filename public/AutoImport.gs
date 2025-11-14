@@ -8,6 +8,7 @@
  *  - v0.3 - Add Comment and Link to File
  *  - v0.4 - Add double tick check
  *  - v0.5 - Hunger compare
+ *  - v0.6 - JSON minify
  * 
  */
 
@@ -62,7 +63,7 @@ function checkFoodItemsFromA1() {
     let rowIndex = -1
 
     // First, check using modshort
-    const withModShort = item.name + ' ' + item.modshort
+    const withModShort = item.n + ' ' + item.m
     itemName = withModShort
 
     rowIndex = values.indexOf(withModShort)
@@ -72,47 +73,47 @@ function checkFoodItemsFromA1() {
       const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
 
       const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
-      if(item.hunger != hungerValue) {
-        notFound.push(`WRONG HUNGER VALUE: ${item.name} / ${withModShort} / NBT: ${item.hunger} -> Sheet: ${hungerValue}`)
+      if(item.h != hungerValue) {
+        notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerValue}`)
       }
 
       if (!isChecked) {
         sheet.getRange(rowIndex + 1, 2).setValue(true)
       } else if (found.includes(withModShort)) {
-        notFound.push(`ALREADY TICKed: ${item.name} / ${withModShort}`)
+        notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
       }
       found.push(itemName)
       return // move to next item
     }
 
     // If not found, check by name only
-    rowIndex = values.indexOf(item.name)
+    rowIndex = values.indexOf(item.n)
     if (rowIndex !== -1) {
       const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
 
       const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
-      if(item.hunger != hungerValue) {
-        notFound.push(`WRONG HUNGER VALUE: ${item.name} / ${withModShort} / NBT: ${item.hunger} -> Sheet: ${hungerValue}`)
+      if(item.h != hungerValue) {
+        notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerValue}`)
       }
 
       if (!isChecked) {
         sheet.getRange(rowIndex + 1, 2).setValue(true)
-      } else if (found.includes(item.name)) {
-        notFound.push(`ALREADY TICKed: ${item.name} / ${withModShort}`)
+      } else if (found.includes(item.n)) {
+        notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
       }
-      itemName = item.name
+      itemName = item.n
       found.push(itemName)
       return // move to next item
     }
 
     // If neither found
-    console.log(`Not found: ${item.name} / ${withModShort}`)
-    notFound.push(`Not found: ${item.name} / ${withModShort}`)
+    console.log(`Not found: ${item.n} / ${withModShort}`)
+    notFound.push(`Not found: ${item.n} / ${withModShort}`)
   })
 
   let foundInOtherSheets = {}
   itemsToCheck.forEach((item) => {
-    foundInOtherSheets[item.name] = false
+    foundInOtherSheets[item.n] = false
   })
 
   // Tick in other sheets
@@ -121,26 +122,26 @@ function checkFoodItemsFromA1() {
     const lastRow = targetSheet.getLastRow()
     if (lastRow === 0) return
 
-    sheetConfig.nameCols.forEach((nameCol, idx) => {
+    sheetConfig.nCols.forEach((nameCol, idx) => {
       const checkCol = sheetConfig.checkCols[idx]
       const names = targetSheet.getRange(1, nameCol, lastRow).getValues().flat()
       itemsToCheck.forEach((item) => {
-        const row = names.indexOf(item.name)
+        const row = names.indexOf(item.n)
 
         if (row !== -1) {
           // console.log(`[✔️] ${sheetName}!${String.fromCharCode(64 + checkCol)}${row + 1}`);
-          foundInOtherSheets[item.name] = true
+          foundInOtherSheets[item.n] = true
           targetSheet.getRange(row + 1, checkCol).setValue(true)
         } else {
-          const withModShort = item.name + ' ' + item.modshort
+          const withModShort = item.n + ' ' + item.m
 
           const row2 = names.indexOf(withModShort)
           if (row2 !== -1) {
             // console.log(`[✔️] ${sheetName}!${String.fromCharCode(64 + checkCol)}${row2 + 1}`);
             targetSheet.getRange(row2 + 1, checkCol).setValue(true)
-            foundInOtherSheets[item.name] = true
+            foundInOtherSheets[item.n] = true
           } else {
-            //console.log(`[🔍] "${item.name}" not found in ${sheetName}`);
+            //console.log(`[🔍] "${item.n}" not found in ${sheetName}`);
           }
         }
       })
