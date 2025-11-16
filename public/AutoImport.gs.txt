@@ -1,7 +1,7 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v1.0
- * 
+ * Version v1.0.1
+ *
  * Changelog:
  *  - v0.1 - Inital
  *  - v0.2 - Add sync Log and fix checkCols and nameCols
@@ -11,7 +11,8 @@
  *  - v0.6 - JSON minify
  *  - v0.6.1 - Fix error that was done in JSON minify
  *  - v1.0 - Refactor to optimized batch processing
- * 
+ *  - v1.0.1 - AutoFormatting 
+ *
  */
 
 function checkFoodItemsFromA1() {
@@ -106,10 +107,10 @@ function checkFoodItemsFromA1() {
   })
 
   // Write all checkboxes at once
-  sheet.getRange(startRow, 2, rowCount).setValues(checkValues.map(v => [v]))
+  sheet.getRange(startRow, 2, rowCount).setValues(checkValues.map((v) => [v]))
 
   // ---------------------------------------------------------
-  //  Process other sheets 
+  //  Process other sheets
   // ---------------------------------------------------------
 
   let foundInOtherSheets = {}
@@ -117,59 +118,59 @@ function checkFoodItemsFromA1() {
     foundInOtherSheets[item.n] = false
   })
 
-Object.entries(config.sheets).forEach(([sheetName, sheetConfig]) => {
-  const targetSheet = ss.getSheetByName(sheetName)
-  if (!targetSheet) return
+  Object.entries(config.sheets).forEach(([sheetName, sheetConfig]) => {
+    const targetSheet = ss.getSheetByName(sheetName)
+    if (!targetSheet) return
 
-  const lastRow = targetSheet.getLastRow()
-  if (lastRow === 0) return
+    const lastRow = targetSheet.getLastRow()
+    if (lastRow === 0) return
 
+    const rowCount = lastRow - startRow + 1
+    // Batch read all name + checkbox columns
+    const allNames = sheetConfig.nameCols.map((col) =>
+      targetSheet.getRange(startRow, col, rowCount).getValues().flat(),
+    )
 
-  const rowCount = lastRow - startRow + 1
-  // Batch read all name + checkbox columns
-  const allNames = sheetConfig.nameCols.map(
-    col => targetSheet.getRange(startRow, col, rowCount).getValues().flat()
-  )
+    const allChecks = sheetConfig.checkCols.map((col) =>
+      targetSheet.getRange(startRow, col, rowCount).getValues().flat(),
+    )
 
-  const allChecks = sheetConfig.checkCols.map(
-    col => targetSheet.getRange(startRow, col, rowCount).getValues().flat()
-  )
+    // Build lookup maps for each name column
+    const nameMaps = allNames.map((colValues) => {
+      const map = {}
+      colValues.forEach((name, row) => {
+        if (name) map[name] = row
+      })
+      return map
+    })
 
-  // Build lookup maps for each name column
-  const nameMaps = allNames.map(colValues => {
-    const map = {}
-    colValues.forEach((name, row) => { if (name) map[name] = row })
-    return map
-  })
+    // Process all items
+    itemsToCheck.forEach((item) => {
+      let foundAny = false
+      const withModShort = item.n + ' ' + item.m
 
-  // Process all items
-  itemsToCheck.forEach(item => {
-    let foundAny = false
-    const withModShort = item.n + " " + item.m
+      nameMaps.forEach((map, idx) => {
+        let row = map[item.n]
+        if (row === undefined) row = map[withModShort]
 
-    nameMaps.forEach((map, idx) => {
-      let row = map[item.n]
-      if (row === undefined) row = map[withModShort]
+        if (row !== undefined) {
+          allChecks[idx][row] = true
+          foundInOtherSheets[item.n] = true
+          foundAny = true
+        }
+      })
 
-      if (row !== undefined) {
-        allChecks[idx][row] = true
-        foundInOtherSheets[item.n] = true
-        foundAny = true
+      if (!foundAny) {
+        // not found in any column of this sheet
       }
     })
 
-    if (!foundAny) {
-      // not found in any column of this sheet
-    }
+    // Batch write checkbox updates
+    sheetConfig.checkCols.forEach((col, idx) => {
+      const colData = allChecks[idx].map((v) => [v])
+      targetSheet.getRange(startRow, col, rowCount).setValues(colData)
+    })
   })
-
-  // Batch write checkbox updates
-  sheetConfig.checkCols.forEach((col, idx) => {
-    const colData = allChecks[idx].map(v => [v])
-    targetSheet.getRange(startRow, col, rowCount).setValues(colData)
-  })
-})
-
 
   let itemsStillFalse = Object.keys(foundInOtherSheets).filter((key) => !foundInOtherSheets[key])
 
