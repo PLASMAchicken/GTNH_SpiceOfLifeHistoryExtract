@@ -1,16 +1,17 @@
 <template>
   <div>
-    <h4>GitHub Repo: <a
-        href="https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract" target="_blank">https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract</a>
+    <h4>GitHub Repository: <a href="https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract"
+        target="_blank">https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract</a>
     </h4>
     <br>
-    <h4>Discord Channel: <a
-        href="https://discord.com/channels/181078474394566657/1329277071091957841" target="_blank">https://discord.com/channels/181078474394566657/1329277071091957841</a>
+    <h4>Discord Channel: <a href="https://discord.com/channels/181078474394566657/1329277071091957841"
+        target="_blank">https://discord.com/channels/181078474394566657/1329277071091957841</a>
     </h4>
     <br>
     <h3>How to use:</h3>
     <h4>1. Make a copy of the Spreadsheet: <a
-        href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing" target="_blank">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a>
+        href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing"
+        target="_blank">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a>
     </h4>
     <h4>2. Add the Spreadsheet Script: <a href="./AutoImport.gs.txt" target="_blank">AutoImport.gs</a></h4>
     <h4>3. Convert playerdata and level.dat to JSON.</h4>
@@ -24,8 +25,8 @@
     <br>ShadowTheAge - GTNH NEI Repository to fetch Item Names
     <br>
     <br>
-    Matches id via level.dat to name, matches name to Display Name via <a
-      href="https://shadowtheage.github.io/gtnh/" target="_blank">ShadowTheAge NEI</a>
+    Matches id via level.dat to name, matches name to Display Name via <a href="https://shadowtheage.github.io/gtnh/"
+      target="_blank">ShadowTheAge NEI</a>
     <br>
     <br>
     <h2>Convert PlayerData NBT into SpiceOfLife History JSON</h2>
