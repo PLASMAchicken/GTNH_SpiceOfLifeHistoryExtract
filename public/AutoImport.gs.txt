@@ -1,6 +1,6 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v0.6.1
+ * Version v1.0
  * 
  * Changelog:
  *  - v0.1 - Inital
@@ -10,22 +10,23 @@
  *  - v0.5 - Hunger compare
  *  - v0.6 - JSON minify
  *  - v0.6.1 - Fix error that was done in JSON minify
+ *  - v1.0 - Refactor to optimized batch processing
  * 
  */
 
 function checkFoodItemsFromA1() {
   const ss = SpreadsheetApp.getActiveSpreadsheet()
   const sheet = ss.getSheetByName('All')
+  const startRow = 5
 
   const ui = SpreadsheetApp.getUi() || {}
   const response = ui.prompt('Please enter the JSON Data into A1 in the All Sheet')
   if (response.getSelectedButton() !== ui.Button.OK) return
 
   let rawInput = sheet.getRange('A1').getValue()
-
   let itemsToCheck = []
 
-  // Parse input
+  // Parse JSON from A1
   try {
     itemsToCheck = JSON.parse(rawInput)
     if (!Array.isArray(itemsToCheck)) throw new Error('A1 does not contain a valid JSON array.')
@@ -33,10 +34,6 @@ function checkFoodItemsFromA1() {
     ui.alert('❌ Error: A1 does not contain a valid JSON array.')
     return
   }
-
-  // Read all names in column C of "All"
-  const allNameValues = sheet.getRange(1, 3, sheet.getLastRow()).getValues().flat().map(String)
-  const notFound = []
 
   // Config
   const config = {
@@ -52,106 +49,133 @@ function checkFoodItemsFromA1() {
     },
   }
 
-  // Read column B (food names)
-  const dataRange = sheet.getRange('C1:C' + sheet.getLastRow())
-  const values = dataRange.getValues().flat()
+  // ---------------------------------------------------------
+  //  ⚡ FAST ALL-SHEET PROCESSING (OPTIMIZED)
+  // ---------------------------------------------------------
 
-  const found = []
+  const lastRow = sheet.getLastRow()
 
-  // Process each item
-  itemsToCheck.forEach((item) => {
-    let itemName = ''
-    let rowIndex = -1
+  const rowCount = lastRow - startRow + 1
+  const nameValues = sheet.getRange(startRow, 3, rowCount).getValues().flat()
+  const checkValues = sheet.getRange(startRow, 2, rowCount).getValues().flat()
+  const hungerValues = sheet.getRange(startRow, 5, rowCount).getValues().flat()
 
-    // First, check using modshort
-    const withModShort = item.n + ' ' + item.m
-    itemName = withModShort
-
-    rowIndex = values.indexOf(withModShort)
-
-    if (rowIndex !== -1) {
-      // Check if checkbox is already ticked in column B
-      const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
-
-      const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
-      if(item.h != hungerValue) {
-        notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerValue}`)
-      }
-
-      if (!isChecked) {
-        sheet.getRange(rowIndex + 1, 2).setValue(true)
-      } else if (found.includes(withModShort)) {
-        notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
-      }
-      found.push(itemName)
-      return // move to next item
-    }
-
-    // If not found, check by name only
-    rowIndex = values.indexOf(item.n)
-    if (rowIndex !== -1) {
-      const isChecked = sheet.getRange(rowIndex + 1, 2).getValue()
-
-      const hungerValue = Number(sheet.getRange(rowIndex + 1, 5).getValue().toString())
-      if(item.h != hungerValue) {
-        notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerValue}`)
-      }
-
-      if (!isChecked) {
-        sheet.getRange(rowIndex + 1, 2).setValue(true)
-      } else if (found.includes(item.n)) {
-        notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
-      }
-      itemName = item.n
-      found.push(itemName)
-      return // move to next item
-    }
-
-    // If neither found
-    console.log(`Not found: ${item.n} / ${withModShort}`)
-    notFound.push(`Not found: ${item.n} / ${withModShort}`)
+  // Build name → row map
+  const nameRowMap = {}
+  nameValues.forEach((name, i) => {
+    if (!nameRowMap[name]) nameRowMap[name] = i
   })
+
+  const notFound = []
+  const found = []
+  const tickUpdates = []
+
+  itemsToCheck.forEach((item) => {
+    const withModShort = item.n + ' ' + item.m
+
+    // Try full match first
+    let rowIndex = nameRowMap[withModShort]
+
+    // Try name only
+    if (rowIndex === undefined) {
+      rowIndex = nameRowMap[item.n]
+    }
+
+    // Not found at all
+    if (rowIndex === undefined) {
+      console.log(`Not found: ${item.n} / ${withModShort}`)
+      notFound.push(`Not found: ${item.n} / ${withModShort}`)
+      return
+    }
+
+    // Compare hunger
+    const hungerSheet = Number(hungerValues[rowIndex])
+    if (hungerSheet !== item.h) {
+      notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerSheet}`)
+    }
+
+    // Tick checkbox if not ticked
+    if (!checkValues[rowIndex]) {
+      checkValues[rowIndex] = true
+      tickUpdates.push(rowIndex)
+    } else if (found.includes(item.n)) {
+      notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
+    }
+
+    found.push(item.n)
+  })
+
+  // Write all checkboxes at once
+  sheet.getRange(startRow, 2, rowCount).setValues(checkValues.map(v => [v]))
+
+  // ---------------------------------------------------------
+  //  Process other sheets 
+  // ---------------------------------------------------------
 
   let foundInOtherSheets = {}
   itemsToCheck.forEach((item) => {
     foundInOtherSheets[item.n] = false
   })
 
-  // Tick in other sheets
-  Object.entries(config.sheets).forEach(([sheetName, sheetConfig]) => {
-    const targetSheet = ss.getSheetByName(sheetName)
-    const lastRow = targetSheet.getLastRow()
-    if (lastRow === 0) return
+Object.entries(config.sheets).forEach(([sheetName, sheetConfig]) => {
+  const targetSheet = ss.getSheetByName(sheetName)
+  if (!targetSheet) return
 
-    sheetConfig.nameCols.forEach((nameCol, idx) => {
-      const checkCol = sheetConfig.checkCols[idx]
-      const names = targetSheet.getRange(1, nameCol, lastRow).getValues().flat()
-      itemsToCheck.forEach((item) => {
-        const row = names.indexOf(item.n)
+  const lastRow = targetSheet.getLastRow()
+  if (lastRow === 0) return
 
-        if (row !== -1) {
-          // console.log(`[✔️] ${sheetName}!${String.fromCharCode(64 + checkCol)}${row + 1}`);
-          foundInOtherSheets[item.n] = true
-          targetSheet.getRange(row + 1, checkCol).setValue(true)
-        } else {
-          const withModShort = item.n + ' ' + item.m
 
-          const row2 = names.indexOf(withModShort)
-          if (row2 !== -1) {
-            // console.log(`[✔️] ${sheetName}!${String.fromCharCode(64 + checkCol)}${row2 + 1}`);
-            targetSheet.getRange(row2 + 1, checkCol).setValue(true)
-            foundInOtherSheets[item.n] = true
-          } else {
-            //console.log(`[🔍] "${item.n}" not found in ${sheetName}`);
-          }
-        }
-      })
-    })
+  const rowCount = lastRow - startRow + 1
+  // Batch read all name + checkbox columns
+  const allNames = sheetConfig.nameCols.map(
+    col => targetSheet.getRange(startRow, col, rowCount).getValues().flat()
+  )
+
+  const allChecks = sheetConfig.checkCols.map(
+    col => targetSheet.getRange(startRow, col, rowCount).getValues().flat()
+  )
+
+  // Build lookup maps for each name column
+  const nameMaps = allNames.map(colValues => {
+    const map = {}
+    colValues.forEach((name, row) => { if (name) map[name] = row })
+    return map
   })
+
+  // Process all items
+  itemsToCheck.forEach(item => {
+    let foundAny = false
+    const withModShort = item.n + " " + item.m
+
+    nameMaps.forEach((map, idx) => {
+      let row = map[item.n]
+      if (row === undefined) row = map[withModShort]
+
+      if (row !== undefined) {
+        allChecks[idx][row] = true
+        foundInOtherSheets[item.n] = true
+        foundAny = true
+      }
+    })
+
+    if (!foundAny) {
+      // not found in any column of this sheet
+    }
+  })
+
+  // Batch write checkbox updates
+  sheetConfig.checkCols.forEach((col, idx) => {
+    const colData = allChecks[idx].map(v => [v])
+    targetSheet.getRange(startRow, col, rowCount).setValues(colData)
+  })
+})
+
 
   let itemsStillFalse = Object.keys(foundInOtherSheets).filter((key) => !foundInOtherSheets[key])
 
-  console.log(itemsStillFalse) // ["item2", "item3"]
+  // ---------------------------------------------------------
+  //  UI OUTPUT
+  // ---------------------------------------------------------
 
   if (notFound.length > 0) {
     ui.alert('⚠️ Some items were not found:\n' + notFound.join('\n'))
@@ -174,7 +198,6 @@ function onOpen() {
     .addToUi()
 }
 
-// Opens a dialog with a clickable link
 function openHistoryExtract() {
   const html = HtmlService.createHtmlOutput(
     '<a href="https://plasmachicken.github.io/GTNH_SpiceOfLifeHistoryExtract/" target="_blank">Open GTNH Spice of Life History Extract</a>',
