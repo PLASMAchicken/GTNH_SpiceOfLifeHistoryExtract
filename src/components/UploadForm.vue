@@ -230,6 +230,16 @@ async function process() {
         }
       }
 
+      if (temp.modshort == "(GT)" && temp.name == "Fries") {
+        switch (x.damage) {
+          case 32204:
+            temp.name = "Fries (In Foil)";
+            break;
+          default:
+            break;
+        }
+      }
+
       if (temp.modshort == "(Natura)" && x.tag == "Natura:natura.stewbowl") {
         if(x.damage >= 14) {
           temp.name = "Glowshroom ";
