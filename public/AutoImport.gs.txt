@@ -1,6 +1,6 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v0.6
+ * Version v0.6.1
  * 
  * Changelog:
  *  - v0.1 - Inital
@@ -9,6 +9,7 @@
  *  - v0.4 - Add double tick check
  *  - v0.5 - Hunger compare
  *  - v0.6 - JSON minify
+ *  - v0.6.1 - Fix error that was done in JSON minify
  * 
  */
 
@@ -122,7 +123,7 @@ function checkFoodItemsFromA1() {
     const lastRow = targetSheet.getLastRow()
     if (lastRow === 0) return
 
-    sheetConfig.nCols.forEach((nameCol, idx) => {
+    sheetConfig.nameCols.forEach((nameCol, idx) => {
       const checkCol = sheetConfig.checkCols[idx]
       const names = targetSheet.getRange(1, nameCol, lastRow).getValues().flat()
       itemsToCheck.forEach((item) => {
