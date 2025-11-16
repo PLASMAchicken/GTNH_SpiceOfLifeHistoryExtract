@@ -8,7 +8,7 @@
     <h4>1. Make a copy of the Spreadsheet: <a
         href="https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing">https://docs.google.com/spreadsheets/d/14bIekbw2_3LEKc0t8HNCKFUHX9fiLgJQ0P_J_W0HUT8/edit?usp=sharing</a>
     </h4>
-    <h4>2. Add the Spreadsheet Script: <a href="./AutoImport.gs">AutoImport.gs</a></h4>
+    <h4>2. Add the Spreadsheet Script: <a href="./AutoImport.gs.txt">AutoImport.gs</a></h4>
     <h4>3. Convert playerdata and level.dat to JSON.</h4>
     <h4>4. Paste into A1 in All Sheet</h4>
     <h4>5. Run Food Tools Import via the button in the Top Bar next to Help / Ask Gemini</h4>
