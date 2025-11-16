@@ -1,5 +1,9 @@
 <template>
   <div>
+    <h4>GitHub Repo: <a
+        href="https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract" target="_blank">https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract</a>
+    </h4>
+    <br>
     <h4>Discord Channel: <a
         href="https://discord.com/channels/181078474394566657/1329277071091957841" target="_blank">https://discord.com/channels/181078474394566657/1329277071091957841</a>
     </h4>
