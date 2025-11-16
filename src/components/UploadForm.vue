@@ -36,7 +36,7 @@
     <br>
     <textarea v-model="output" rows="5" cols="120" readonly style="white-space: pre; font-family: monospace"></textarea>
     <br>
-    <p>Last update: {{ formattedDate }}   // {{ gitCommit }}</p>
+    <p>Last update: {{ formattedDate }} // {{ gitCommit }}</p>
   </div>
 </template>
 
@@ -241,7 +241,7 @@ async function process() {
       }
 
       if (temp.modshort == "(Natura)" && x.tag == "Natura:natura.stewbowl") {
-        if(x.damage >= 14) {
+        if (x.damage >= 14) {
           temp.name = "Glowshroom ";
         } else {
           temp.name = "Mushroom ";
