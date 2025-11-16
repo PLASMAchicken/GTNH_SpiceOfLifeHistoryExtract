@@ -1,6 +1,6 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs
- * Version v0.5
+ * Version v0.6
  * 
  * Changelog:
  *  - v0.1 - Inital
