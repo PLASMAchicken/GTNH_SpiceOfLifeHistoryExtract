@@ -1,5 +1,12 @@
 # nbtextractorweb
 
+## Instructions and how to use are directly on the Site
+https://plasmachicken.github.io/GTNH_SpiceOfLifeHistoryExtract/
+
+
+
+# How to Develop
+
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
