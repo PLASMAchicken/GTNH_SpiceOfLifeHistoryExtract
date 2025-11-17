@@ -212,7 +212,7 @@ async function process() {
 
         if (item == null) {
           console.error(itemRepoTag);
-          return { name: itemRepoTag, modshort: '- ERROR IN DB LOOKUP', notfound: true };
+          return { n: itemRepoTag, m: '- ERROR IN DB LOOKUP', notfound: true };
         }
 
         temp.name = item.name;
@@ -287,7 +287,7 @@ async function process() {
       delete temp.modshort;
       delete temp.hunger;
 
-      return temp || { name: x, modshort: ' - ERROR', notfound: true };
+      return temp || { n: x, m: ' - ERROR', notfound: true };
 
     }))
 
