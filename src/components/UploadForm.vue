@@ -199,6 +199,7 @@ async function process() {
         else if (x.damage == 1) {
           temp.name = "Golden Apple (Blocks)";
         }
+        temp.modshort = ModToShort("minecraft");
 
         // Override for PamHarvestcraft Cakes
       } else if (pamFix[x.tag]) {
