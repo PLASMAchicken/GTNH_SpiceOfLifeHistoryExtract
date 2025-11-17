@@ -212,8 +212,15 @@ async function process() {
         let item = repo.GetById(itemRepoTag);
 
         if (item == null) {
-          console.error(itemRepoTag);
-          return { n: itemRepoTag, m: '- ERROR IN DB LOOKUP', notfound: true };
+
+          // Cake Lookup Attempt, might also work for PamHarvestcraft Cakes
+          const itemRepoTagCake = "i:" + x.tag + "Item" + ":" + x.damage;
+          item = repo.GetById(itemRepoTagCake);
+          if (item == null) {
+
+            console.error(itemRepoTag);
+            return { n: itemRepoTag, m: '- ERROR IN DB LOOKUP', notfound: true };
+          }
         }
 
         temp.name = item.name;
