@@ -188,6 +188,12 @@ async function process() {
       "harvestcraft:pampumpkincheeseCake": "Pumpkin Cheese Cake"
     };
 
+    const manualFix = {
+      "i:BloodArsenal:blood_cake:0": {name: "Blood Cake", mod: "BloodArsenal"},
+      "i:TConstruct:strangeFood:2": {name: "Bacon", mod: "TConstruct"},
+      "i:Forestry:beverage:1": {name: "Curative Mead", mod: "Forestry"},
+    };
+
     output.value = JSON.stringify(eaten_tags.map((x) => {
       let temp = {};
 
@@ -217,9 +223,12 @@ async function process() {
           const itemRepoTagCake = "i:" + x.tag + "Item" + ":" + x.damage;
           item = repo.GetById(itemRepoTagCake);
           if (item == null) {
-
-            console.error(itemRepoTag);
-            return { n: itemRepoTag, m: '- ERROR IN DB LOOKUP', notfound: true };
+            // Emergency Fix Lookup
+            item = manualFix[itemRepoTag];
+            if (item == null) {
+              console.error(itemRepoTag);
+              return { n: itemRepoTag, m: '- ERROR IN DB LOOKUP', notfound: true };
+            }
           }
         }
 
