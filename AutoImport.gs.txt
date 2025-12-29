@@ -1,0 +1,210 @@
+/*
+ * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs.txt
+ * Version v1.0.2
+ *
+ * Changelog:
+ *  - v0.1 - Inital
+ *  - v0.2 - Add sync Log and fix checkCols and nameCols
+ *  - v0.3 - Add Comment and Link to File
+ *  - v0.4 - Add double tick check
+ *  - v0.5 - Hunger compare
+ *  - v0.6 - JSON minify
+ *  - v0.6.1 - Fix error that was done in JSON minify
+ *  - v1.0 - Refactor to optimized batch processing
+ *  - v1.0.1 - AutoFormatting 
+ *  - v1.0.2 - Fix URL in Auto-Importer script header
+ *
+ */
+
+function checkFoodItemsFromA1() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet()
+  const sheet = ss.getSheetByName('All')
+  const startRow = 5
+
+  const ui = SpreadsheetApp.getUi() || {}
+  const response = ui.prompt('Please enter the JSON Data into A1 in the All Sheet')
+  if (response.getSelectedButton() !== ui.Button.OK) return
+
+  let rawInput = sheet.getRange('A1').getValue()
+  let itemsToCheck = []
+
+  // Parse JSON from A1
+  try {
+    itemsToCheck = JSON.parse(rawInput)
+    if (!Array.isArray(itemsToCheck)) throw new Error('A1 does not contain a valid JSON array.')
+  } catch (e) {
+    ui.alert('❌ Error: A1 does not contain a valid JSON array.')
+    return
+  }
+
+  // Config
+  const config = {
+    allSheet: 'All',
+    allCheckboxCols: [2, 7],
+    allNameCols: [3, 8],
+    sheets: {
+      'T1 (Raw)': { checkCols: [2, 7, 12, 17, 22], nameCols: [3, 8, 13, 18, 23] },
+      'T2 (Basic)': { checkCols: [2, 7, 12, 17, 22, 27], nameCols: [3, 8, 13, 18, 23, 28] },
+      'T3 (Intermediate)': { checkCols: [2, 7, 12, 17, 22], nameCols: [3, 8, 13, 18, 23] },
+      'T4 (Advanced)': { checkCols: [2, 7, 12, 17, 22], nameCols: [3, 8, 13, 18, 23] },
+      Other: { checkCols: [2, 7, 12], nameCols: [3, 8, 13] },
+    },
+  }
+
+  // ---------------------------------------------------------
+  //  ⚡ FAST ALL-SHEET PROCESSING (OPTIMIZED)
+  // ---------------------------------------------------------
+
+  const lastRow = sheet.getLastRow()
+
+  const rowCount = lastRow - startRow + 1
+  const nameValues = sheet.getRange(startRow, 3, rowCount).getValues().flat()
+  const checkValues = sheet.getRange(startRow, 2, rowCount).getValues().flat()
+  const hungerValues = sheet.getRange(startRow, 5, rowCount).getValues().flat()
+
+  // Build name → row map
+  const nameRowMap = {}
+  nameValues.forEach((name, i) => {
+    if (!nameRowMap[name]) nameRowMap[name] = i
+  })
+
+  const notFound = []
+  const found = []
+  const tickUpdates = []
+
+  itemsToCheck.forEach((item) => {
+    const withModShort = item.n + ' ' + item.m
+
+    // Try full match first
+    let rowIndex = nameRowMap[withModShort]
+
+    // Try name only
+    if (rowIndex === undefined) {
+      rowIndex = nameRowMap[item.n]
+    }
+
+    // Not found at all
+    if (rowIndex === undefined) {
+      console.log(`Not found: ${item.n} / ${withModShort}`)
+      notFound.push(`Not found: ${item.n} / ${withModShort}`)
+      return
+    }
+
+    // Compare hunger
+    const hungerSheet = Number(hungerValues[rowIndex])
+    if (hungerSheet !== item.h) {
+      notFound.push(`WRONG HUNGER VALUE: ${item.n} / ${withModShort} / NBT: ${item.h} -> Sheet: ${hungerSheet}`)
+    }
+
+    // Tick checkbox if not ticked
+    if (!checkValues[rowIndex]) {
+      checkValues[rowIndex] = true
+      tickUpdates.push(rowIndex)
+    } else if (found.includes(item.n)) {
+      notFound.push(`ALREADY TICKed: ${item.n} / ${withModShort}`)
+    }
+
+    found.push(item.n)
+  })
+
+  // Write all checkboxes at once
+  sheet.getRange(startRow, 2, rowCount).setValues(checkValues.map((v) => [v]))
+
+  // ---------------------------------------------------------
+  //  Process other sheets
+  // ---------------------------------------------------------
+
+  let foundInOtherSheets = {}
+  itemsToCheck.forEach((item) => {
+    foundInOtherSheets[item.n] = false
+  })
+
+  Object.entries(config.sheets).forEach(([sheetName, sheetConfig]) => {
+    const targetSheet = ss.getSheetByName(sheetName)
+    if (!targetSheet) return
+
+    const lastRow = targetSheet.getLastRow()
+    if (lastRow === 0) return
+
+    const rowCount = lastRow - startRow + 1
+    // Batch read all name + checkbox columns
+    const allNames = sheetConfig.nameCols.map((col) =>
+      targetSheet.getRange(startRow, col, rowCount).getValues().flat(),
+    )
+
+    const allChecks = sheetConfig.checkCols.map((col) =>
+      targetSheet.getRange(startRow, col, rowCount).getValues().flat(),
+    )
+
+    // Build lookup maps for each name column
+    const nameMaps = allNames.map((colValues) => {
+      const map = {}
+      colValues.forEach((name, row) => {
+        if (name) map[name] = row
+      })
+      return map
+    })
+
+    // Process all items
+    itemsToCheck.forEach((item) => {
+      let foundAny = false
+      const withModShort = item.n + ' ' + item.m
+
+      nameMaps.forEach((map, idx) => {
+        let row = map[item.n]
+        if (row === undefined) row = map[withModShort]
+
+        if (row !== undefined) {
+          allChecks[idx][row] = true
+          foundInOtherSheets[item.n] = true
+          foundAny = true
+        }
+      })
+
+      if (!foundAny) {
+        // not found in any column of this sheet
+      }
+    })
+
+    // Batch write checkbox updates
+    sheetConfig.checkCols.forEach((col, idx) => {
+      const colData = allChecks[idx].map((v) => [v])
+      targetSheet.getRange(startRow, col, rowCount).setValues(colData)
+    })
+  })
+
+  let itemsStillFalse = Object.keys(foundInOtherSheets).filter((key) => !foundInOtherSheets[key])
+
+  // ---------------------------------------------------------
+  //  UI OUTPUT
+  // ---------------------------------------------------------
+
+  if (notFound.length > 0) {
+    ui.alert('⚠️ Some items were not found:\n' + notFound.join('\n'))
+  } else {
+    ui.alert('✅ All items processed successfully!')
+  }
+
+  if (itemsStillFalse.length > 0) {
+    ui.alert('⚠️ Some items were not synced:\n' + itemsStillFalse.join('\n'))
+  } else {
+    ui.alert('✅ All items synced successfully!')
+  }
+}
+
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createMenu('✔️ Food Tools')
+    .addItem('Check Foods from Prompt', 'checkFoodItemsFromA1')
+    .addItem('Open History Extract', 'openHistoryExtract')
+    .addToUi()
+}
+
+function openHistoryExtract() {
+  const html = HtmlService.createHtmlOutput(
+    '<a href="https://plasmachicken.github.io/GTNH_SpiceOfLifeHistoryExtract/" target="_blank">Open GTNH Spice of Life History Extract</a>',
+  )
+    .setWidth(300)
+    .setHeight(80)
+  SpreadsheetApp.getUi().showModalDialog(html, 'GTNH History Extract')
+}
