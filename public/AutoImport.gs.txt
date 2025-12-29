@@ -1,6 +1,6 @@
 /*
  * Auto-Importer Script from https://github.com/PLASMAchicken/GTNH_SpiceOfLifeHistoryExtract/blob/master/public/AutoImport.gs.txt
- * Version v1.0.1
+ * Version v1.0.2
  *
  * Changelog:
  *  - v0.1 - Inital
@@ -12,6 +12,7 @@
  *  - v0.6.1 - Fix error that was done in JSON minify
  *  - v1.0 - Refactor to optimized batch processing
  *  - v1.0.1 - AutoFormatting 
+ *  - v1.0.2 - Fix URL in Auto-Importer script header
  *
  */
 
